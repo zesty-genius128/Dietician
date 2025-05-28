@@ -4,7 +4,7 @@ A Health & Fitness app supercharged by Gemini AI. Easily log your food and worko
 
 ## Features
 
-*   **Secure User Authentication:** Robust sign-up, login, and logout flow powered by Firebase Authentication.
+*   **Secure User Authentication:** Robust sign-up, login, and sign-out flow powered by Firebase Authentication.
 *   **Personalized User Profile:** Users can set and update their health metrics, fitness level, activity level, dietary restrictions, and cuisine preferences.
 *   **Food Logging:** Intuitive interface to log food items with details including date, meal type, food name, calories, protein, carbs, and fat.
 *   **Exercise Logging:** Allows users to record their exercise sessions, including date, type, duration, and calories burned.
@@ -79,4 +79,23 @@ To run this project locally, follow these steps:
         ```
         Replace `YOUR_GEMINI_API_KEY` with the key you obtained. *Make sure this file is included in your `.gitignore`* (it is already in the provided `.gitignore`).
 5.  **Start the development server:**
-    ```
+    ```bash
+    npm start
+    # or
+    yarn start
+    ```    The app should open in your browser at `http://localhost:3000`.
+
+## Future Improvements
+
+*   Implement more detailed data visualization and analytics for logged data.
+*   Expand AI features (e.g., personalized meal plans, workout routines).
+*   Add unit and integration tests.
+*   Improve error handling and user feedback.
+*   Implement data validation on frontend and potentially backend (with Firebase Rules).
+*   Enhance UI/UX based on user feedback.
+
+<!-- ## Screenshots
+
+*(Add screenshots or a link to a demo here. This is crucial for showcasing the project!)*
+
+--- -->
