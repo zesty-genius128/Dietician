@@ -1,8 +1,11 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// --- src/firebaseInit.js ---
+// Purpose: Initializes Firebase and exports the auth and db instances.
+// This keeps your Firebase configuration separate.
+
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth'; // Corrected: Import getAuth
+import { getFirestore } from 'firebase/firestore'; // Corrected: Import getFirestore
+import { setLogLevel } from 'firebase/app'; // Corrected: Import setLogLevel
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -21,19 +24,18 @@ const firebaseConfig = {
 export const firestoreAppId = 'default-dietitian-app-enhanced';
 
 let app;
-let auth;
-let db;
+let authInstance; // Renamed to avoid conflict with exported 'auth'
+let dbInstance;   // Renamed to avoid conflict with exported 'db'
 
 try {
     app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-    setLogLevel('debug'); // Or 'silent' for production
+    authInstance = getAuth(app); // Corrected: Initialize auth
+    dbInstance = getFirestore(app); // Corrected: Initialize db
+    setLogLevel('debug'); 
     console.log("Firebase initialized successfully from firebaseInit.js.");
 } catch (error) {
     console.error("Firebase initialization error in firebaseInit.js:", error);
-    // In a real app, you might want to display an error to the user here
-    // or have a fallback mechanism.
 }
 
-export { app, auth, db };
+// Export the initialized instances
+export { app, authInstance as auth, dbInstance as db };

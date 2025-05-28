@@ -1,10 +1,10 @@
 // --- src/pages/features/RecipeSuggestionPage.js ---
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext'; // Adjusted path
+import { useAuth } from '../../contexts/AuthContext'; 
 import { doc, onSnapshot } from 'firebase/firestore';
-import { db as firestoreDb, firestoreAppId } from '../../firebaseInit'; // Adjusted path
-import LoadingSpinner from '../../components/ui/LoadingSpinner'; // Adjusted path
-import Modal from '../../components/ui/Modal'; // Adjusted path
+import { db as firestoreDb, firestoreAppId } from '../../firebaseInit'; 
+import LoadingSpinner from '../../components/ui/LoadingSpinner'; 
+import Modal from '../../components/ui/Modal'; 
 
 const RecipeSuggestionPage = () => {
     const { userId } = useAuth();
@@ -46,7 +46,7 @@ const RecipeSuggestionPage = () => {
                 }, required: ["recipeName", "description", "ingredients", "instructions"]}}
             }
         };
-        // IMPORTANT: Replace with your actual Gemini API Key or use environment variables
+        
         const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY || ""; 
         if (!GEMINI_API_KEY) {
             setError("Gemini API key is not configured. Please set REACT_APP_GEMINI_API_KEY in your .env file.");
