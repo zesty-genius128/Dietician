@@ -6,10 +6,16 @@ import { db as firestoreDb, firestoreAppId } from '../../firebaseInit';
 import LoadingSpinner from '../../components/ui/LoadingSpinner'; 
 import Modal from '../../components/ui/Modal'; 
 
+const muscleGroupOptions = [
+    "Full Body", "Legs", "Chest", "Back", "Shoulders", 
+    "Biceps", "Triceps", "Abs/Core"
+];
+
 const ExerciseGuidePage = () => {
     const { userId } = useAuth();
     const [profileFitnessLevel, setProfileFitnessLevel] = useState('Beginner');
     const [selectedLevel, setSelectedLevel] = useState('');
+    const [selectedMuscleGroup, setSelectedMuscleGroup] = useState(muscleGroupOptions[0]); // Default to "Full Body"
     const [exercises, setExercises] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -18,7 +24,7 @@ const ExerciseGuidePage = () => {
 
     useEffect(() => {
         if (!userId) { 
-            if (!selectedLevel) setSelectedLevel('Beginner'); // Ensure selectedLevel has a default
+            if (!selectedLevel) setSelectedLevel('Beginner'); 
             return; 
         }
         const profileRef = doc(firestoreDb, `artifacts/${firestoreAppId}/users/${userId}/profile`, "data");
@@ -30,13 +36,15 @@ const ExerciseGuidePage = () => {
             } else { if (!selectedLevel) setSelectedLevel('Beginner'); }
         }, () => { setError("Could not load profile fitness level."); if (!selectedLevel) setSelectedLevel('Beginner');});
         return () => unsub();
-    }, [userId, selectedLevel]); // Added selectedLevel to ensure it's set if userId loads later
+    }, [userId, selectedLevel]); 
 
     const generateExercises = async () => {
         if (!selectedLevel) { setError("Please select a fitness level."); return; }
+        if (!selectedMuscleGroup) { setError("Please select a target muscle group."); return; }
+
         setLoading(true); setError(''); setExercises([]);
-        let promptText = `Suggest 5 suitable exercises for a ${selectedLevel} fitness level. `;
-        promptText += "For each: exerciseName (string), description (string, max 30 words), instructions (array of strings detailing steps & common mistakes). Format as JSON array of objects.";
+        let promptText = `Suggest 3-5 suitable exercises for a ${selectedLevel} fitness level, specifically targeting the ${selectedMuscleGroup}. `;
+        promptText += "For each exercise: provide its exerciseName (string), a brief description (string, max 30 words), and detailed instructions (array of strings, detailing steps & common mistakes to avoid). Format as JSON array of objects.";
         
         const payload = {
             contents: [{role:"user", parts:[{text:promptText}]}],
@@ -62,7 +70,7 @@ const ExerciseGuidePage = () => {
                 const jsonText = result.candidates[0].content.parts[0].text;
                 try { setExercises(JSON.parse(jsonText)); }
                 catch(e) { setError("Error parsing AI exercises. Raw: " + jsonText.substring(0,100));}
-            } else { setError(`No valid exercises from AI. ${result.promptFeedback?.blockReason || ''}`); }
+            } else { setError(`No valid exercises from AI. ${result.promptFeedback?.blockReason ? `Reason: ${result.promptFeedback.blockReason}` : ''}`); }
         } catch (err) { setError(`Exercise fetch error: ${err.message}`); }
         setLoading(false);
     };
@@ -73,22 +81,54 @@ const ExerciseGuidePage = () => {
         <div className="page-content-container">
             <div className="content-wrapper-xl">
                 <h2 className="page-title">AI Exercise Guide</h2>
-                <p className="page-subtitle">Select fitness level for suggestions. Consult a pro before starting.</p>
+                <p className="page-subtitle">Select fitness level and target muscle group for suggestions. Consult a pro before starting.</p>
                 {error && <p className="message-box error">{error}</p>}
-                <div className="prompt-section flex flex-col sm:flex-row items-center gap-4">
+                
+                <div className="prompt-section flex flex-col sm:flex-row items-start sm:items-end gap-4">
                     <div className="flex-grow w-full sm:w-auto">
-                        <label htmlFor="fitnessLevelSelect" className="form-label mb-1">Select Fitness Level:</label>
-                        <select id="fitnessLevelSelect" value={selectedLevel} onChange={(e) => setSelectedLevel(e.target.value)} className="input-style w-full">
+                        <label htmlFor="fitnessLevelSelect" className="form-label mb-1">Fitness Level:</label>
+                        <select 
+                            id="fitnessLevelSelect" 
+                            value={selectedLevel} 
+                            onChange={(e) => setSelectedLevel(e.target.value)} 
+                            className="input-style w-full"
+                        >
                             <option value="" disabled>Loading level...</option>
-                            <option value="Beginner">Beginner</option><option value="Intermediate">Intermediate</option><option value="Advanced">Advanced</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
                         </select>
-                        {profileFitnessLevel && selectedLevel !== profileFitnessLevel && <p className="text-xs text-gray-500 mt-1">Your profile level is {profileFitnessLevel}.</p>}
+                        {profileFitnessLevel && selectedLevel !== profileFitnessLevel && 
+                            <p className="text-xs text-gray-500 mt-1">Your profile level: {profileFitnessLevel}.</p>}
                     </div>
-                    <button onClick={generateExercises} disabled={loading || !selectedLevel} className="btn-primary w-full sm:w-auto mt-2 sm:mt-0 self-end disabled:bg-gray-400">{loading ? 'Getting Exercises...' : 'Get Exercises'}</button>
+
+                    <div className="flex-grow w-full sm:w-auto">
+                        <label htmlFor="muscleGroupSelect" className="form-label mb-1">Target Muscle Group:</label>
+                        <select 
+                            id="muscleGroupSelect"
+                            value={selectedMuscleGroup}
+                            onChange={(e) => setSelectedMuscleGroup(e.target.value)}
+                            className="input-style w-full"
+                        >
+                            {muscleGroupOptions.map(group => (
+                                <option key={group} value={group}>{group}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <button 
+                        onClick={generateExercises} 
+                        disabled={loading || !selectedLevel || !selectedMuscleGroup} 
+                        className="btn-primary w-full sm:w-auto mt-2 sm:mt-0 self-stretch sm:self-end disabled:bg-gray-400"
+                    >
+                        {loading ? 'Getting Exercises...' : 'Get Exercises'}
+                    </button>
                 </div>
+
                 {loading && <LoadingSpinner />}
+
                 {exercises.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                         {exercises.map((ex, idx) => (
                             <div key={idx} className="card-item">
                                 <div><h3 className="card-title">{ex.exerciseName}</h3><p className="card-description">{ex.description}</p></div>
