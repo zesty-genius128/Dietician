@@ -1,6 +1,6 @@
 # AI Dietitian App
 
-A modern, full-stack AI-powered web application designed to help users manage their health and fitness. The app provides tools for logging daily food intake and exercise, managing a personal health profile, and receiving personalized AI-driven recipe and exercise suggestions.
+A Health & Fitness app supercharged by Gemini AI. Easily log your food and workouts, receive AI-driven personalized exercise routines with proper form guidance, and discover custom recipes tailored to your dietary needs and cuisine preferences.
 
 ## Features
 
