@@ -1,24 +1,24 @@
 // --- src/App.js ---
 import React, { useState, useEffect } from 'react';
-import { AuthProvider, useAuth } from './contexts/AuthContext'; // Adjusted path
+import { AuthProvider, useAuth } from './contexts/AuthContext'; 
 
 // Layout Components
-import Navbar from './components/layout/Navbar'; // Adjusted path
-import Footer from './components/layout/Footer'; // Adjusted path
-import LoadingSpinner from './components/ui/LoadingSpinner'; // Adjusted path
+import Navbar from './components/layout/Navbar'; 
+import Footer from './components/layout/Footer'; 
+import LoadingSpinner from './components/ui/LoadingSpinner'; 
 
-// Page Components
-import LoginPage from './pages/auth/LoginPage'; // Adjusted path
-import SignupPage from './pages/auth/SignupPage'; // Adjusted path
-import ProfilePage from './pages/user/ProfilePage'; // Adjusted path
-import FoodLogPage from './pages/logging/FoodLogPage'; // Adjusted path
-import ExerciseLogPage from './pages/logging/ExerciseLogPage'; // Adjusted path
-import RecipeSuggestionPage from './pages/features/RecipeSuggestionPage'; // Adjusted path
-import ExerciseGuidePage from './pages/features/ExerciseGuidePage'; // Adjusted path
-import DashboardPage from './pages/DashboardPage'; // Adjusted path
+// Page Components - Corrected paths
+import LoginPage from './pages/auth/LoginPage'; 
+import SignupPage from './pages/auth/SignupPage'; 
+import ProfilePage from './pages/user/ProfilePage'; 
+import FoodLogPage from './pages/logging/FoodLogPage'; 
+import ExerciseLogPage from './pages/logging/ExerciseLogPage'; 
+import RecipeSuggestionPage from './pages/features/RecipeSuggestionPage'; 
+import ExerciseGuidePage from './pages/features/ExerciseGuidePage'; 
+import DashboardPage from './pages/DashboardPage'; // Corrected: Path is directly under pages
 
 
-const AppContent = () => { // Renamed from App to AppContent
+const AppContent = () => { 
     const [currentPage, setCurrentPage] = useState('login'); 
     const { currentUser, loadingAuth } = useAuth();
 
@@ -30,7 +30,7 @@ const AppContent = () => { // Renamed from App to AppContent
                 if (currentPage !== 'login' && currentPage !== 'signup') setCurrentPage('login');
             }
         }
-    }, [currentUser, loadingAuth, currentPage, setCurrentPage]); // Added setCurrentPage to dependencies
+    }, [currentUser, loadingAuth, currentPage, setCurrentPage]); 
 
     const renderPage = () => {
         if (loadingAuth) {
@@ -56,7 +56,6 @@ const AppContent = () => { // Renamed from App to AppContent
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
-            {/* Global styles can be in index.css or a global style component */}
             <style jsx global>{`
                 .page-container { @apply flex flex-col items-center justify-center min-h-[calc(100vh-120px)] bg-gray-100 p-4; }
                 .form-container { @apply w-full max-w-md bg-white p-6 sm:p-8 rounded-lg shadow-lg; }
@@ -102,7 +101,6 @@ const AppContent = () => { // Renamed from App to AppContent
     );
 };
 
-// This is the actual default export for App.js
 const App = () => (
     <AuthProvider>
         <AppContent />
@@ -110,4 +108,3 @@ const App = () => (
 );
 
 export default App;
-

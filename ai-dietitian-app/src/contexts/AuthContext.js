@@ -1,3 +1,4 @@
+// --- src/contexts/AuthContext.js ---
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { 
     signInAnonymously, 
@@ -8,7 +9,7 @@ import {
     signOut 
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, Timestamp } from 'firebase/firestore';
-import { auth as firebaseAuth, db as firestoreDb, firestoreAppId } from '../firebaseInit'; // Use aliased imports
+import { auth as firebaseAuth, db as firestoreDb, firestoreAppId } from '../firebaseInit';
 
 const AuthContext = createContext();
 
@@ -44,10 +45,12 @@ export const AuthProvider = ({ children }) => {
             } else {
                 setCurrentUser(null);
                 setUserId(null);
-                // Attempt anonymous sign-in if no user. 
-                // Remove __initial_auth_token logic if not applicable to your setup.
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { // This is more for specific environments like Canvas
+                // __initial_auth_token is a global potentially injected by specific environments (e.g., Canvas).
+                // For local development, this will likely be undefined and anonymous sign-in will proceed.
+                // eslint-disable-next-line no-undef 
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { 
                     try {
+                         // eslint-disable-next-line no-undef
                         await signInWithCustomToken(firebaseAuth, __initial_auth_token);
                     } catch (error) {
                         try { await signInAnonymously(firebaseAuth); } catch (e) { console.error("Anonymous sign-in failed (AuthContext)", e); }

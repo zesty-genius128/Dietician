@@ -1,10 +1,10 @@
 // --- src/pages/features/ExerciseGuidePage.js ---
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext'; // Adjusted path
+import { useAuth } from '../../contexts/AuthContext'; 
 import { doc, onSnapshot } from 'firebase/firestore';
-import { db as firestoreDb, firestoreAppId } from '../../firebaseInit'; // Adjusted path
-import LoadingSpinner from '../../components/ui/LoadingSpinner'; // Adjusted path
-import Modal from '../../components/ui/Modal'; // Adjusted path
+import { db as firestoreDb, firestoreAppId } from '../../firebaseInit'; 
+import LoadingSpinner from '../../components/ui/LoadingSpinner'; 
+import Modal from '../../components/ui/Modal'; 
 
 const ExerciseGuidePage = () => {
     const { userId } = useAuth();
@@ -17,24 +17,20 @@ const ExerciseGuidePage = () => {
     const [selectedExercise, setSelectedExercise] = useState(null);
 
     useEffect(() => {
-        if (!userId) { setSelectedLevel('Beginner'); return; }
+        if (!userId) { 
+            if (!selectedLevel) setSelectedLevel('Beginner'); // Ensure selectedLevel has a default
+            return; 
+        }
         const profileRef = doc(firestoreDb, `artifacts/${firestoreAppId}/users/${userId}/profile`, "data");
         const unsub = onSnapshot(profileRef, (docSnap) => {
             if (docSnap.exists()) {
                 const level = docSnap.data().fitnessLevel || 'Beginner';
                 setProfileFitnessLevel(level);
-                if (!selectedLevel) setSelectedLevel(level); // Only set if not already overridden by user
+                if (!selectedLevel) setSelectedLevel(level); 
             } else { if (!selectedLevel) setSelectedLevel('Beginner'); }
         }, () => { setError("Could not load profile fitness level."); if (!selectedLevel) setSelectedLevel('Beginner');});
         return () => unsub();
-    }, [userId]);
-
-    useEffect(() => { // Sync selectedLevel if profileFitnessLevel changes and selectedLevel was based on it
-        if (profileFitnessLevel && !selectedLevel) {
-            setSelectedLevel(profileFitnessLevel);
-        }
-    }, [profileFitnessLevel, selectedLevel]);
-
+    }, [userId, selectedLevel]); // Added selectedLevel to ensure it's set if userId loads later
 
     const generateExercises = async () => {
         if (!selectedLevel) { setError("Please select a fitness level."); return; }
@@ -83,11 +79,12 @@ const ExerciseGuidePage = () => {
                     <div className="flex-grow w-full sm:w-auto">
                         <label htmlFor="fitnessLevelSelect" className="form-label mb-1">Select Fitness Level:</label>
                         <select id="fitnessLevelSelect" value={selectedLevel} onChange={(e) => setSelectedLevel(e.target.value)} className="input-style w-full">
+                            <option value="" disabled>Loading level...</option>
                             <option value="Beginner">Beginner</option><option value="Intermediate">Intermediate</option><option value="Advanced">Advanced</option>
                         </select>
                         {profileFitnessLevel && selectedLevel !== profileFitnessLevel && <p className="text-xs text-gray-500 mt-1">Your profile level is {profileFitnessLevel}.</p>}
                     </div>
-                    <button onClick={generateExercises} disabled={loading} className="btn-primary w-full sm:w-auto mt-2 sm:mt-0 self-end disabled:bg-gray-400">{loading ? 'Getting Exercises...' : 'Get Exercises'}</button>
+                    <button onClick={generateExercises} disabled={loading || !selectedLevel} className="btn-primary w-full sm:w-auto mt-2 sm:mt-0 self-end disabled:bg-gray-400">{loading ? 'Getting Exercises...' : 'Get Exercises'}</button>
                 </div>
                 {loading && <LoadingSpinner />}
                 {exercises.length > 0 && (
